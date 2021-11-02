@@ -11,12 +11,13 @@
 // the rights to use, copy, modify, merge, publish, distribute, sublicense, 
 // and/or sell copies of the Software, and to permit persons to whom the 
 // Software is furnished to do so, subject to the following conditions:
-define(["require", "exports", "tslib", "esri/layers/GraphicsLayer", "esri/request", "esri/geometry/support/webMercatorUtils", "esri/core/watchUtils", "esri/geometry/Point", "esri/core/accessorSupport/decorators", "esri/views/2d/layers/BaseLayerView2D", "esri/core/promiseUtils"], function (require, exports, tslib_1, GraphicsLayer_1, request_1, webMercatorUtils_1, watchUtils_1, Point_1, decorators_1, BaseLayerView2D_1, promiseUtils_1) {
+define(["require", "exports", "tslib", "esri/layers/GraphicsLayer", "esri/request", "esri/geometry/support/webMercatorUtils", "esri/core/watchUtils", "esri/geometry/Point", "esri/core/accessorSupport/decorators", "esri/views/2d/layers/BaseLayerView2D", "esri/core/promiseUtils"], function (require, exports, tslib_1, GraphicsLayer_1, request_1, webMercatorUtils_1, watchUtils_1, Point_1, asd, BaseLayerView2D_1, promiseUtils_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     GraphicsLayer_1 = tslib_1.__importDefault(GraphicsLayer_1);
     request_1 = tslib_1.__importDefault(request_1);
     Point_1 = tslib_1.__importDefault(Point_1);
+    asd = tslib_1.__importStar(asd);
     BaseLayerView2D_1 = tslib_1.__importDefault(BaseLayerView2D_1);
     var AnimatedEnvironmentLayerView2D = /** @class */ (function (_super) {
         tslib_1.__extends(AnimatedEnvironmentLayerView2D, _super);
@@ -361,22 +362,22 @@ define(["require", "exports", "tslib", "esri/layers/GraphicsLayer", "esri/reques
             this.draw();
         };
         tslib_1.__decorate([
-            decorators_1.property()
+            asd.property()
         ], AnimatedEnvironmentLayer.prototype, "url", void 0);
         tslib_1.__decorate([
-            decorators_1.property()
+            asd.property()
         ], AnimatedEnvironmentLayer.prototype, "displayOptions", void 0);
         tslib_1.__decorate([
-            decorators_1.property()
+            asd.property()
         ], AnimatedEnvironmentLayer.prototype, "reportValues", void 0);
         tslib_1.__decorate([
-            decorators_1.property()
+            asd.property()
         ], AnimatedEnvironmentLayer.prototype, "dataLoading", void 0);
         tslib_1.__decorate([
-            decorators_1.property()
+            asd.property()
         ], AnimatedEnvironmentLayer.prototype, "isErrored", void 0);
         AnimatedEnvironmentLayer = tslib_1.__decorate([
-            decorators_1.subclass("AnimatedEnvironmentLayer")
+            asd.subclass("AnimatedEnvironmentLayer")
         ], AnimatedEnvironmentLayer);
         return AnimatedEnvironmentLayer;
     }(GraphicsLayer_1.default));

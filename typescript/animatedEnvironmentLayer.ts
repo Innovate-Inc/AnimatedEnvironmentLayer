@@ -32,7 +32,7 @@ import Extent from "esri/geometry/Extent";
 import {webMercatorToGeographic} from "esri/geometry/support/webMercatorUtils";
 import {watch} from "esri/core/watchUtils";
 import Point from "esri/geometry/Point";
-import {property, subclass} from "esri/core/accessorSupport/decorators";
+import * as asd from "esri/core/accessorSupport/decorators";
 import BaseLayerView2D from "esri/views/2d/layers/BaseLayerView2D";
 import {create} from "esri/core/promiseUtils";
 
@@ -404,22 +404,22 @@ class AnimatedEnvironmentLayerView2D extends BaseLayerView2D {
 
 }
 
-@subclass("AnimatedEnvironmentLayer")
+@asd.subclass("AnimatedEnvironmentLayer")
 export class AnimatedEnvironmentLayer extends GraphicsLayer {
 
-    @property()
+    @asd.property()
     url: string;
 
-    @property()
+    @asd.property()
     displayOptions: DisplayOptions;
 
-    @property()
+    @asd.property()
     reportValues: boolean;
 
-    @property()
+    @asd.property()
     dataLoading: boolean;
 
-    @property()
+    @asd.property()
     isErrored: boolean;
 
     private dataFetchRequired: boolean;
