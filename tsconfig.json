@@ -1,20 +1,24 @@
 {
   "compilerOptions": {
     "module": "amd",
-    "noImplicitAny": false,
-    "noEmitOnError": true,
-    "removeComments": false,
-    "target": "es5",
-    "outDir": "ael",
-    "moduleResolution": "classic",
+    "lib": ["es6", "dom"],
+    "noImplicitAny": true,
+    "esModuleInterop": true,
     "sourceMap": true,
-    "emitDecoratorMetadata": true,
+    "jsx": "react",
+    "jsxFactory": "tsx",
+    "target": "ES5",
     "experimentalDecorators": true,
-    "lib": [ "es2015", "dom", "scripthost" ],
-    "typeRoots": [ "./node_modules/@types" ] // had to set this otherwise the dojo typings don't work for some reason
+    "preserveConstEnums": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "importHelpers": true,
+    "moduleResolution": "node",
+    "outDir": "ael"
   },
-  "files": [
-    "typescript/animatedEnvironmentLayer.ts",
-    "typescript/pageSetup.ts"
+  "include": [
+    "./typescript/*"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }

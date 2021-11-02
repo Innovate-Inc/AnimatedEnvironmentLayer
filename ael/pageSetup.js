@@ -1,7 +1,11 @@
-/// <reference path="../typings/index.d.ts" />
-define(["require", "exports", "esri/views/MapView", "esri/Map", "esri/geometry/Point", "esri/geometry/SpatialReference", "esri/Basemap", "dojo/on", "dojo/dom", "./animatedEnvironmentLayer"], function (require, exports, MapView, Map, Point, SpatialReference, Basemap, on, dom, animatedEnvironmentLayer_1) {
+define(["require", "exports", "tslib", "esri/views/MapView", "esri/Map", "esri/geometry/Point", "esri/geometry/SpatialReference", "esri/Basemap", "./animatedEnvironmentLayer"], function (require, exports, tslib_1, MapView_1, Map_1, Point_1, SpatialReference_1, Basemap_1, animatedEnvironmentLayer_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    MapView_1 = tslib_1.__importDefault(MapView_1);
+    Map_1 = tslib_1.__importDefault(Map_1);
+    Point_1 = tslib_1.__importDefault(Point_1);
+    SpatialReference_1 = tslib_1.__importDefault(SpatialReference_1);
+    Basemap_1 = tslib_1.__importDefault(Basemap_1);
     var PageSetup = /** @class */ (function () {
         function PageSetup() {
             this._dataOptions = [];
@@ -9,13 +13,13 @@ define(["require", "exports", "esri/views/MapView", "esri/Map", "esri/geometry/P
         PageSetup.prototype.init = function () {
             var _this = this;
             this._initDataOptions();
-            var satellite = Basemap.fromId("satellite");
-            this.map = new Map({
+            var satellite = Basemap_1.default.fromId("satellite");
+            this.map = new Map_1.default({
                 basemap: satellite
             });
-            this.mapView = new MapView({
+            this.mapView = new MapView_1.default({
                 container: "map-view",
-                center: new Point({ x: 134, y: -24, spatialReference: new SpatialReference({ wkid: 4326 }) }),
+                center: new Point_1.default({ x: 134, y: -24, spatialReference: new SpatialReference_1.default({ wkid: 4326 }) }),
                 zoom: 4,
                 map: this.map,
                 ui: { components: ["compass", "zoom"] }
@@ -28,14 +32,14 @@ define(["require", "exports", "esri/views/MapView", "esri/Map", "esri/geometry/P
                 displayOptions: this._dataOptions[0].displayOptions
             });
             this.map.add(this.environmentLayer);
-            //setup some event handlers to react to change of options       
-            on(dom.byId("data-select"), "change", function (evt) { return _this._dataChange(evt.target.value); });
-            on(dom.byId("basemap-select"), "change", function (evt) { return _this._basemapChange(evt.target.value); });
+            //setup some event handlers to react to change of options
+            document.getElementById("data-select").addEventListener("change", function (evt) { return _this._dataChange(evt.target.value); });
+            document.getElementById("basemap-select").addEventListener("change", function (evt) { return _this._basemapChange(evt.target.value); });
             // subscribe to the point-report event and display the values in UI.
             var windLayerAny = this.environmentLayer;
             windLayerAny.on("point-report", function (rpt) {
-                dom.byId("direction").innerHTML = rpt.degree ? rpt.degree.toFixed(1) : "n/a";
-                dom.byId("speed").innerHTML = rpt.velocity ? rpt.velocity.toFixed(2) : "n/a";
+                document.getElementById("direction").innerHTML = rpt.degree ? rpt.degree.toFixed(1) : "n/a";
+                document.getElementById("speed").innerHTML = rpt.velocity ? rpt.velocity.toFixed(2) : "n/a";
             });
         };
         PageSetup.prototype._dataChange = function (id) {
@@ -81,7 +85,10 @@ define(["require", "exports", "esri/views/MapView", "esri/Map", "esri/geometry/P
                     maxVelocity: 15,
                     velocityScale: 0.01,
                     frameRate: 30,
-                    particleDensity: [{ zoom: 2, density: 10 }, { zoom: 4, density: 9 }, { zoom: 8, density: 6 }, { zoom: 10, density: 4 }, { zoom: 12, density: 3 }],
+                    particleDensity: [{ zoom: 2, density: 10 }, { zoom: 4, density: 9 }, { zoom: 8, density: 6 }, {
+                            zoom: 10,
+                            density: 4
+                        }, { zoom: 12, density: 3 }],
                     customFadeFunction: this.customFadeFunction,
                     customDrawFunction: this.customDrawFunction // a custom draw function
                 }
@@ -89,7 +96,7 @@ define(["require", "exports", "esri/views/MapView", "esri/Map", "esri/geometry/P
             this._dataOptions.push(globalWind);
             this._dataOptions.push(ausSwell);
             this._dataOptions.push(globalWind2);
-            var select = dom.byId("data-select");
+            var select = document.getElementById("data-select");
             this._dataOptions.forEach(function (opt) {
                 var element = document.createElement("option");
                 element.id = opt.id;
@@ -115,7 +122,7 @@ define(["require", "exports", "esri/views/MapView", "esri/Map", "esri/geometry/P
             //context.clearRect(bounds.x, bounds.y, bounds.width, bounds.height);
         };
         PageSetup.prototype._basemapChange = function (id) {
-            var bm = Basemap.fromId(id);
+            var bm = Basemap_1.default.fromId(id);
             this.map.basemap = bm;
         };
         return PageSetup;

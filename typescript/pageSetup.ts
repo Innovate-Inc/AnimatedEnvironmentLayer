@@ -1,17 +1,12 @@
-﻿/// <reference path="../typings/index.d.ts" />
+﻿import MapView from "esri/views/MapView";
+import SceneView from "esri/views/SceneView";
+import Map from "esri/Map";
+import Point from "esri/geometry/Point";
+import SpatialReference from "esri/geometry/SpatialReference";
+import Basemap from "esri/Basemap";
 
-import * as MapView from "esri/views/MapView";
-import * as SceneView from "esri/views/SceneView";
-import * as Map from "esri/Map";
-import * as Point from "esri/geometry/Point";
-import * as SpatialReference from "esri/geometry/SpatialReference";
-import * as Basemap from "esri/Basemap";
-import * as on from "dojo/on";
-import * as dom from "dojo/dom";
-import * as domClass from "dojo/dom-class";
- 
-import { AnimatedEnvironmentLayer, DisplayOptions, PointReport, Bounds, Particle } from "./animatedEnvironmentLayer";
- 
+import {AnimatedEnvironmentLayer, DisplayOptions, PointReport, Bounds, Particle} from "./animatedEnvironmentLayer";
+
 interface DataOption {
     id: string;
     url: string;
@@ -40,12 +35,12 @@ export class PageSetup {
             basemap: satellite
         });
 
-        this.mapView = new MapView({ 
+        this.mapView = new MapView({
             container: "map-view",
-            center: new Point({ x: 134, y: -24, spatialReference: new SpatialReference({ wkid: 4326 }) }),
+            center: new Point({x: 134, y: -24, spatialReference: new SpatialReference({wkid: 4326})}),
             zoom: 4,
             map: this.map,
-            ui: { components: ["compass", "zoom"] }
+            ui: {components: ["compass", "zoom"]}
         });
         this.mapView.ui.move("zoom", "bottom-right");
         this.mapView.ui.move("compass", "bottom-right");
@@ -58,20 +53,20 @@ export class PageSetup {
 
         this.map.add(this.environmentLayer);
 
-        //setup some event handlers to react to change of options       
-        on(dom.byId("data-select"), "change", (evt) => this._dataChange(evt.target.value));
-        on(dom.byId("basemap-select"), "change", (evt) => this._basemapChange(evt.target.value));
+        //setup some event handlers to react to change of options
+        document.getElementById("data-select").addEventListener("change", (evt: any) => this._dataChange(evt.target.value));
+        document.getElementById("basemap-select").addEventListener("change", (evt: any) => this._basemapChange(evt.target.value));
 
         // subscribe to the point-report event and display the values in UI.
         let windLayerAny: any = this.environmentLayer;
         windLayerAny.on("point-report", (rpt: PointReport) => {
-            dom.byId("direction").innerHTML = rpt.degree ? rpt.degree.toFixed(1) : "n/a";
-            dom.byId("speed").innerHTML = rpt.velocity ? rpt.velocity.toFixed(2) : "n/a";
+            document.getElementById("direction").innerHTML = rpt.degree ? rpt.degree.toFixed(1) : "n/a";
+            document.getElementById("speed").innerHTML = rpt.velocity ? rpt.velocity.toFixed(2) : "n/a";
         });
-        
+
     }
 
-    private _dataChange(id) {
+    private _dataChange(id: any) {
         let opt = undefined;
         for (let i = 0, len = this._dataOptions.length; i < len; i++) {
             if (this._dataOptions[i].id === id) {
@@ -96,7 +91,7 @@ export class PageSetup {
             displayOptions: {
                 maxVelocity: 15
             },
-            
+
         };
 
         // Make swell look different to wind
@@ -119,17 +114,20 @@ export class PageSetup {
                 maxVelocity: 15,
                 velocityScale: 0.01,
                 frameRate: 30,
-                particleDensity: [{ zoom: 2, density: 10 }, { zoom: 4, density: 9 }, { zoom: 8, density: 6 }, { zoom: 10, density: 4 }, { zoom: 12, density: 3 }],
+                particleDensity: [{zoom: 2, density: 10}, {zoom: 4, density: 9}, {zoom: 8, density: 6}, {
+                    zoom: 10,
+                    density: 4
+                }, {zoom: 12, density: 3}],
                 customFadeFunction: this.customFadeFunction, // a custom fade function
                 customDrawFunction: this.customDrawFunction // a custom draw function
-            } 
+            }
         };
 
         this._dataOptions.push(globalWind);
         this._dataOptions.push(ausSwell);
         this._dataOptions.push(globalWind2);
 
-        let select = dom.byId("data-select");
+        let select = document.getElementById("data-select");
         this._dataOptions.forEach((opt) => {
             let element = document.createElement("option");
             element.id = opt.id;
@@ -163,7 +161,7 @@ export class PageSetup {
 
     }
 
-    private _basemapChange(id) {
+    private _basemapChange(id: string) {
         let bm = Basemap.fromId(id);
         this.map.basemap = bm;
     }

@@ -24,17 +24,17 @@
 // THE SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////
 
-import * as MapView from "esri/views/MapView";
-import * as SceneView from "esri/views/SceneView";
-import * as GraphicsLayer from "esri/layers/GraphicsLayer";
-import * as esriRequest from "esri/request";
-import * as Extent from "esri/geometry/Extent";
-import * as webMercatorUtils from "esri/geometry/support/webMercatorUtils";
-import * as watchUtils from "esri/core/watchUtils";
-import * as Point from "esri/geometry/Point";
-import * as asd from "esri/core/accessorSupport/decorators";
-import * as BaseLayerView2D from "esri/views/2d/layers/BaseLayerView2D";
-import * as promiseUtils from "esri/core/promiseUtils";
+import MapView from "esri/views/MapView";
+import SceneView from "esri/views/SceneView";
+import GraphicsLayer from "esri/layers/GraphicsLayer";
+import esriRequest from "esri/request";
+import Extent from "esri/geometry/Extent";
+import {webMercatorToGeographic} from "esri/geometry/support/webMercatorUtils";
+import {watch} from "esri/core/watchUtils";
+import Point from "esri/geometry/Point";
+import {property, subclass} from "esri/core/accessorSupport/decorators";
+import BaseLayerView2D from "esri/views/2d/layers/BaseLayerView2D";
+import {create} from "esri/core/promiseUtils";
 
 
 export type CustomFadeFunction = (context: CanvasRenderingContext2D, bounds: Bounds) => void;
@@ -157,7 +157,6 @@ export interface Particle {
     currentVector?: number[];
 }
 
-
 class AnimatedEnvironmentLayerView2D extends BaseLayerView2D {
 
     layer: AnimatedEnvironmentLayer;
@@ -173,8 +172,9 @@ class AnimatedEnvironmentLayerView2D extends BaseLayerView2D {
 
     windy: Windy;
     date: Date;
+    view: MapView
 
-    constructor(props) {
+    constructor(props: any) {
         super();
         this.view = props.view;
         this.layer = <AnimatedEnvironmentLayer>props.layer;
@@ -188,7 +188,7 @@ class AnimatedEnvironmentLayerView2D extends BaseLayerView2D {
         });
 
 
-        watchUtils.watch(this.layer, "visible", (nv, olv, pn, ta) => {
+        watch(this.layer, "visible", (nv, olv, pn, ta) => {
             if (!nv) {
                 this.clear();
             }
@@ -200,7 +200,7 @@ class AnimatedEnvironmentLayerView2D extends BaseLayerView2D {
     }
 
 
-    render(renderParameters) {
+    render(renderParameters: any) {
 
         this.viewState = renderParameters.state;
 
@@ -215,7 +215,7 @@ class AnimatedEnvironmentLayerView2D extends BaseLayerView2D {
             return;
         }
 
-        if (!this.drawPrepping && !this.drawReady) { 
+        if (!this.drawPrepping && !this.drawReady) {
             // prep the draw
             this.drawPrepping = true;
             if (this.windy && this.windy.gridData) {
@@ -260,7 +260,7 @@ class AnimatedEnvironmentLayerView2D extends BaseLayerView2D {
     attach() {
 
         // use attach to initilaize a custom canvas to draw on
-        // create the canvas, set some properties. 
+        // create the canvas, set some properties.
         let canvas = document.createElement("canvas");
         canvas.id = "ael-" + Date.now();
         canvas.style.position = "absolute";
@@ -275,10 +275,10 @@ class AnimatedEnvironmentLayerView2D extends BaseLayerView2D {
     }
 
     /**
-     * Init the windy class 
+     * Init the windy class
      * @param data
      */
-    private initWindy(data?) {
+    private initWindy(data?: any) {
         this.windy = new Windy(
             this.context.canvas,
             this.layer.displayOptions,
@@ -314,14 +314,14 @@ class AnimatedEnvironmentLayerView2D extends BaseLayerView2D {
         this.drawReady = true;
         this.requestRender();
     }
-     
+
 
     private startDraw() {
 
         // use the extent of the view, and not the extent passed into fetchImage...it was slightly off when it crossed IDL.
         let extent = this.view.extent;
         if (extent.spatialReference.isWebMercator) {
-            extent = <Extent>webMercatorUtils.webMercatorToGeographic(extent);
+            extent = <Extent>webMercatorToGeographic(extent);
         }
 
         this.northEast = new Point({ x: extent.xmax, y: extent.ymax });
@@ -352,7 +352,7 @@ class AnimatedEnvironmentLayerView2D extends BaseLayerView2D {
             return stop.zoom;
         });
 
-        // loop the zooms 
+        // loop the zooms
 
         for (let i = 0; i < stops.length; i++) {
             let stop = stops[i];
@@ -404,25 +404,22 @@ class AnimatedEnvironmentLayerView2D extends BaseLayerView2D {
 
 }
 
-
-
-
-@asd.subclass("AnimatedEnvironmentLayer")
+@subclass("AnimatedEnvironmentLayer")
 export class AnimatedEnvironmentLayer extends GraphicsLayer {
 
-    @asd.property()
+    @property()
     url: string;
 
-    @asd.property()
+    @property()
     displayOptions: DisplayOptions;
 
-    @asd.property()
+    @property()
     reportValues: boolean;
 
-    @asd.property()
+    @property()
     dataLoading: boolean;
 
-    @asd.property()
+    @property()
     isErrored: boolean;
 
     private dataFetchRequired: boolean;
@@ -446,13 +443,13 @@ export class AnimatedEnvironmentLayer extends GraphicsLayer {
         this.reportValues = properties.reportValues === false ? false : true; // default to true
 
         // watch url prop so a fetch of data and redraw will occur.
-        watchUtils.watch(this, "url", (a, b, c, d) => this._urlChanged(a, b, c, d));
+        watch(this, "url", (a, b, c, d) => this._urlChanged(a, b, c, d));
 
         // watch visible so a fetch of data and redraw will occur.
-        watchUtils.watch(this, "visible", (a, b, c, d) => this._visibleChanged(a, b, c, d));
+        watch(this, "visible", (a, b, c, d) => this._visibleChanged(a, b, c, d));
 
         // watch display options so to redraw when changed.
-        watchUtils.watch(this, "displayOptions", (a, b, c, d) => this._displayOptionsChanged(a, b, c, d));
+        watch(this, "displayOptions", (a, b, c, d) => this._displayOptionsChanged(a, b, c, d));
         this.dataFetchRequired = true;
     }
 
@@ -476,7 +473,7 @@ export class AnimatedEnvironmentLayer extends GraphicsLayer {
         this.layerView.attach();
 
         this.draw(true);
-        return promiseUtils.create((resolve, reject) => resolve(this.layerView));
+        return create((resolve, reject) => resolve(this.layerView));
     }
 
     /**
@@ -535,13 +532,13 @@ export class AnimatedEnvironmentLayer extends GraphicsLayer {
     }
 
 
-    private viewPointerMove(evt) {
+    private viewPointerMove(evt: any) {
         if (!this.layerView.windy || !this.visible) return;
 
         let mousePos = this._getMousePos(evt);
         let point = this.layerView.view.toMap({ x: mousePos.x, y: mousePos.y });
         if (point.spatialReference.isWebMercator) {
-            point = <Point>webMercatorUtils.webMercatorToGeographic(point);
+            point = <Point>webMercatorToGeographic(point);
         }
 
         let grid = this.layerView.windy.interpolate(point.x, point.y);
@@ -568,7 +565,7 @@ export class AnimatedEnvironmentLayer extends GraphicsLayer {
      * @param uMs
      * @param vMs
      */
-    private _vectorToSpeed(uMs, vMs) {
+    private _vectorToSpeed(uMs: number, vMs: number) {
         let speedAbs = Math.sqrt(Math.pow(uMs, 2) + Math.pow(vMs, 2));
         return speedAbs;
     }
@@ -578,7 +575,7 @@ export class AnimatedEnvironmentLayer extends GraphicsLayer {
      * @param uMs
      * @param vMs
      */
-    private _vectorToDegrees(uMs, vMs) {
+    private _vectorToDegrees(uMs: number, vMs: number) {
 
         let abs = Math.sqrt(Math.pow(uMs, 2) + Math.pow(vMs, 2));
         let direction = Math.atan2(uMs / abs, vMs / abs);
@@ -591,7 +588,7 @@ export class AnimatedEnvironmentLayer extends GraphicsLayer {
     }
 
 
-    private _getMousePos(evt) {
+    private _getMousePos(evt: any) {
         // container on the view is actually a html element at this point, not a string as the typings suggest.
         let container: any = this.layerView.view.container;
         let rect = container.getBoundingClientRect();
@@ -605,7 +602,7 @@ export class AnimatedEnvironmentLayer extends GraphicsLayer {
     /**
      * Watch of the url property - call draw again with a refetch
      */
-    private _urlChanged(a, b, c, d) {
+    private _urlChanged(a: any, b: any, c: any, d: any) {
         this.stop();
         this.dataFetchRequired = true;
         this.draw();
@@ -614,7 +611,7 @@ export class AnimatedEnvironmentLayer extends GraphicsLayer {
     /**
      * Watch of the visible property - stop and start depending on value
      */
-    private _visibleChanged(visible, b, c, d) {
+    private _visibleChanged(visible: any, b: any, c: any, d: any) {
         if (!visible) {
             this.stop();
         }
@@ -627,7 +624,7 @@ export class AnimatedEnvironmentLayer extends GraphicsLayer {
     /**
      * Watch of displayOptions - call draw again with new options set on windy.
      */
-    private _displayOptionsChanged(newOptions, b, c, d) {
+    private _displayOptionsChanged(newOptions: any, b: any, c: any, d: any) {
         if (!this.layerView.windy) return;
 
         this.layerView.windy.stop();
@@ -665,18 +662,18 @@ class Windy {
     NULL_WIND_VECTOR = [NaN, NaN, null]; // singleton for no wind in the form: [u, v, magnitude]
 
     static field: any;
-    static animationLoop;
+    static animationLoop: any;
 
-    builder;
-    grid;
+    builder: any;
+    grid: any;
     gridData: any;
-    date;
-    lo1;
-    la1;
-    dx;
-    dy;
-    ni;
-    nj;
+    date: any;
+    lo1: any;
+    la1: any;
+    dx: any;
+    dy: any;
+    ni: any;
+    nj: any;
 
     private _scanMode: number;
 
@@ -688,7 +685,7 @@ class Windy {
 
     }
 
-    setData(data) {
+    setData(data: any) {
         this.gridData = data;
     }
 
@@ -717,7 +714,7 @@ class Windy {
 
     }
 
-    start(bounds, width, height, extent) {
+    start(bounds: any, width: number, height: number, extent: any[]) {
 
         let mapBounds = {
             south: this.deg2rad(extent[0][1]),
@@ -731,9 +728,9 @@ class Windy {
         this.stop();
 
         // build grid
-        this.buildGrid(this.gridData, (gridResult) => {
+        this.buildGrid(this.gridData, (gridResult: any) => {
             let builtBounds = this.buildBounds(bounds, width, height);
-            this.interpolateField(gridResult, builtBounds, mapBounds, (bounds, field) => {
+            this.interpolateField(gridResult, builtBounds, mapBounds, (bounds: any, field: any) => {
                 // animate the canvas with random points
                 Windy.field = field;
                 this.animate(bounds, Windy.field);
@@ -752,7 +749,7 @@ class Windy {
    * @param lat {Float} Latitude
    * @returns {Object}
    */
-    interpolate(lon, lat) {
+    interpolate(lon: number, lat: number) {
 
         if (!this.grid) return null;
 
@@ -787,7 +784,7 @@ class Windy {
         return null;
     }
 
-    private buildGrid(data, callback) {
+    private buildGrid(data: number, callback: any) {
 
         this.builder = this.createBuilder(data);
         var header = this.builder.header;
@@ -847,17 +844,17 @@ class Windy {
         });
     }
 
-    private createBuilder(data) {
-        let uComp = null,
-            vComp = null,
-            scalar = null,
-            directionTrue = null,
-            magnitude = null;
+    private createBuilder(data: any) {
+        let uComp: any = null,
+            vComp: any = null,
+            scalar: any = null,
+            directionTrue: any = null,
+            magnitude: any = null;
 
-        let supported = true;
-        let headerFields;
+        let supported: boolean = true;
+        let headerFields: string;
 
-        data.forEach((record) => {
+        data.forEach((record: any) => {
             headerFields = `${record.header.discipline},${record.header.parameterCategory},${record.header.parameterNumber}`;
             switch (headerFields) {
                 case "0,1,2":
@@ -927,12 +924,12 @@ class Windy {
         return this.createWindBuilder(uComp, vComp);
     }
 
-    private createWindBuilder(uComp, vComp) {
+    private createWindBuilder(uComp: any, vComp: any) {
         let uData = uComp.data,
             vData = vComp.data;
         return {
             header: uComp.header,
-            data: function data(i) {
+            data: function data(i: number) {
                 return [uData[i], vData[i]];
             },
             interpolate: this.bilinearInterpolateVector
@@ -940,7 +937,7 @@ class Windy {
     }
 
 
-    private buildBounds(bounds, width, height) : Bounds {
+    private buildBounds(bounds: Extent, width: number, height: number) : Bounds {
         let upperLeft = bounds[0];
         let lowerRight = bounds[1];
         let x = Math.round(upperLeft[0]);
@@ -959,7 +956,7 @@ class Windy {
 
 
     // interpolation for vectors like wind (u,v,m)
-    private bilinearInterpolateVector(x, y, g00, g10, g01, g11) {
+    private bilinearInterpolateVector(x: number, y: number, g00: any[], g10: any[], g01: any[], g11: any[]) {
         let rx = 1 - x;
         let ry = 1 - y;
         let a = rx * ry,
@@ -971,18 +968,18 @@ class Windy {
         return [u, v, Math.sqrt(u * u + v * v)];
     }
 
-    private deg2rad(deg) {
+    private deg2rad(deg: number) {
         return deg / 180 * Math.PI;
     }
 
-    private rad2deg(ang) {
+    private rad2deg(ang: number) {
         return ang / (Math.PI / 180.0);
     }
 
     /**
     * @returns {Boolean} true if the specified value is not null and not undefined.
     */
-    private isValue(x) {
+    private isValue(x: any) {
         return x !== null && x !== undefined;
     }
 
@@ -990,14 +987,14 @@ class Windy {
     * @returns {Number} returns remainder of floored division, i.e., floor(a / n). Useful for consistent modulo
     *          of negative numbers. See http://en.wikipedia.org/wiki/Modulo_operation.
     */
-    private floorMod(a, n) {
+    private floorMod(a: number, n: number) {
         return a - n * Math.floor(a / n);
     }
 
     /**
     * @returns {Number} the value x clamped to the range [low, high].
     */
-    private clamp(x, range) {
+    private clamp(x: number, range: any[]) {
         return Math.max(range[0], Math.min(x, range[1]));
     }
 
@@ -1012,7 +1009,7 @@ class Windy {
     * Calculate distortion of the wind vector caused by the shape of the projection at point (x, y). The wind
     * vector is modified in place and returned by this function.
     */
-    private distort(projection, lon, lat, x, y, scale, wind, windy) {
+    private distort(projection: any, lon: number, lat: number, x: number, y: number, scale: number, wind: any[], windy: any) {
         var u = wind[0] * scale;
         var v = wind[1] * scale;
         var d = this.distortion(projection, lon, lat, x, y, windy);
@@ -1023,7 +1020,7 @@ class Windy {
         return wind;
     }
 
-    private distortion(projection, lon, lat, x, y, windy) {
+    private distortion(projection: any, lon: number, lat: number, x: number, y: number, windy: any) {
         let tau = 2 * Math.PI;
         let H = Math.pow(10, -5.2);
         let hLon = lon < 0 ? H : -H;
@@ -1038,11 +1035,11 @@ class Windy {
         return [(pLon[0] - x) / hLon / k, (pLon[1] - y) / hLon / k, (pLat[0] - x) / hLat, (pLat[1] - y) / hLat];
     }
 
-    private mercY(lat) {
+    private mercY(lat: number) {
         return Math.log(Math.tan(lat / 2 + Math.PI / 4));
     }
 
-    private project(lat, lon, windy) {
+    private project(lat: number, lon: number, windy: any) {
         // both in radians, use deg2rad if neccessary
         let ymin = this.mercY(windy.south);
         let ymax = this.mercY(windy.north);
@@ -1055,7 +1052,7 @@ class Windy {
         return [x, y];
     }
 
-    private invert(x, y, windy) {
+    private invert(x: number, y: number, windy: any) {
         let mapLonDelta = windy.east - windy.west;
         let worldMapRadius = windy.width / this.rad2deg(mapLonDelta) * 360 / (2 * Math.PI);
         let mapOffsetY = worldMapRadius / 2 * Math.log((1 + Math.sin(windy.south)) / (1 - Math.sin(windy.south)));
@@ -1068,17 +1065,17 @@ class Windy {
     }
 
 
-    private interpolateField(grid, bounds: Bounds, extent, callback) {
+    private interpolateField(grid: any, bounds: Bounds, extent: any, callback: any) {
 
         let projection = {};
         let mapArea = (extent.south - extent.north) * (extent.west - extent.east);
         let velocityScale = this.displayOptions.velocityScale * Math.pow(mapArea, 0.4);
 
-        let columns = [];
+        let columns: any[] = [];
         let x = bounds.x;
 
-        let interpolateColumn = (x) => {
-            let column = [];
+        let interpolateColumn = (x: number) => {
+            let column: any[] = [];
             for (let y = bounds.y; y <= bounds.yMax; y += 2) {
                 let coord = this.invert(x, y, extent);
                 if (coord) {
@@ -1113,13 +1110,13 @@ class Windy {
     }
 
 
-    private createField(columns, bounds: Bounds, callback) {
+    private createField(columns: any[], bounds: Bounds, callback: any) {
 
         /**
         * @returns {Array} wind vector [u, v, magnitude] at the point (x, y), or [NaN, NaN, null] if wind
         *          is undefined at that point.
         */
-        let field: any = (x, y) => {
+        let field: any = (x: number, y: number) => {
             var column = columns[Math.round(x)];
             return column && column[Math.round(y)] || this.NULL_WIND_VECTOR;
         }
@@ -1146,10 +1143,10 @@ class Windy {
         callback(bounds, field);
     }
 
-    private animate(bounds: Bounds, field) {
+    private animate(bounds: Bounds, field: any) {
 
-        let windIntensityColorScale = (min, max) => {
-            this.colorScale.indexFor = (m) => {
+        let windIntensityColorScale = (min: number, max: number) => {
+            this.colorScale.indexFor = (m: number) => {
                 // map velocity speed to a style
                 return Math.max(0, Math.min(this.colorScale.length - 1, Math.round((m - min) / (max - min) * (this.colorScale.length - 1))));
             };
@@ -1157,9 +1154,7 @@ class Windy {
         }
 
         let colorStyles = windIntensityColorScale(this.displayOptions.minVelocity, this.displayOptions.maxVelocity);
-        let buckets = colorStyles.map(function () {
-            return [];
-        });
+        let buckets = colorStyles.map((): any[] => []);
 
         // based on the density setting, add that many per 50px x 50px
         let densityRatio = 50 * window.devicePixelRatio;
@@ -1229,7 +1224,7 @@ class Windy {
             }
             
             // Draw new particle trails.
-            buckets.forEach((bucket: Particle[], i) => {
+            buckets.forEach((bucket: Particle[], i: number) => {
                 if (bucket.length > 0) {
 
                     if (!this.displayOptions.customDrawFunction) {

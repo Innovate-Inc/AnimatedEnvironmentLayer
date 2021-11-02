@@ -11,33 +11,15 @@
 // the rights to use, copy, modify, merge, publish, distribute, sublicense, 
 // and/or sell copies of the Software, and to permit persons to whom the 
 // Software is furnished to do so, subject to the following conditions:
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-define(["require", "exports", "esri/layers/GraphicsLayer", "esri/request", "esri/geometry/support/webMercatorUtils", "esri/core/watchUtils", "esri/geometry/Point", "esri/core/accessorSupport/decorators", "esri/views/2d/layers/BaseLayerView2D", "esri/core/promiseUtils"], function (require, exports, GraphicsLayer, esriRequest, webMercatorUtils, watchUtils, Point, asd, BaseLayerView2D, promiseUtils) {
+define(["require", "exports", "tslib", "esri/layers/GraphicsLayer", "esri/request", "esri/geometry/support/webMercatorUtils", "esri/core/watchUtils", "esri/geometry/Point", "esri/core/accessorSupport/decorators", "esri/views/2d/layers/BaseLayerView2D", "esri/core/promiseUtils"], function (require, exports, tslib_1, GraphicsLayer_1, request_1, webMercatorUtils_1, watchUtils_1, Point_1, decorators_1, BaseLayerView2D_1, promiseUtils_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    GraphicsLayer_1 = tslib_1.__importDefault(GraphicsLayer_1);
+    request_1 = tslib_1.__importDefault(request_1);
+    Point_1 = tslib_1.__importDefault(Point_1);
+    BaseLayerView2D_1 = tslib_1.__importDefault(BaseLayerView2D_1);
     var AnimatedEnvironmentLayerView2D = /** @class */ (function (_super) {
-        __extends(AnimatedEnvironmentLayerView2D, _super);
+        tslib_1.__extends(AnimatedEnvironmentLayerView2D, _super);
         function AnimatedEnvironmentLayerView2D(props) {
             var _this = _super.call(this) || this;
             _this.view = props.view;
@@ -49,7 +31,7 @@ define(["require", "exports", "esri/layers/GraphicsLayer", "esri/request", "esri
                 _this.context.canvas.width = _this.view.width;
                 _this.context.canvas.height = _this.view.height;
             });
-            watchUtils.watch(_this.layer, "visible", function (nv, olv, pn, ta) {
+            watchUtils_1.watch(_this.layer, "visible", function (nv, olv, pn, ta) {
                 if (!nv) {
                     _this.clear();
                 }
@@ -100,7 +82,7 @@ define(["require", "exports", "esri/layers/GraphicsLayer", "esri/request", "esri
         };
         AnimatedEnvironmentLayerView2D.prototype.attach = function () {
             // use attach to initilaize a custom canvas to draw on
-            // create the canvas, set some properties. 
+            // create the canvas, set some properties.
             var canvas = document.createElement("canvas");
             canvas.id = "ael-" + Date.now();
             canvas.style.position = "absolute";
@@ -145,10 +127,10 @@ define(["require", "exports", "esri/layers/GraphicsLayer", "esri/request", "esri
             // use the extent of the view, and not the extent passed into fetchImage...it was slightly off when it crossed IDL.
             var extent = this.view.extent;
             if (extent.spatialReference.isWebMercator) {
-                extent = webMercatorUtils.webMercatorToGeographic(extent);
+                extent = webMercatorUtils_1.webMercatorToGeographic(extent);
             }
-            this.northEast = new Point({ x: extent.xmax, y: extent.ymax });
-            this.southWest = new Point({ x: extent.xmin, y: extent.ymin });
+            this.northEast = new Point_1.default({ x: extent.xmax, y: extent.ymax });
+            this.southWest = new Point_1.default({ x: extent.xmin, y: extent.ymin });
             // resize the canvas
             this.context.canvas.width = this.view.width;
             this.context.canvas.height = this.view.height;
@@ -167,7 +149,7 @@ define(["require", "exports", "esri/layers/GraphicsLayer", "esri/request", "esri
             var zoomMap = stops.map(function (stop) {
                 return stop.zoom;
             });
-            // loop the zooms 
+            // loop the zooms
             for (var i = 0; i < stops.length; i++) {
                 var stop_1 = stops[i];
                 if (stop_1.zoom === currentZoom) {
@@ -205,9 +187,9 @@ define(["require", "exports", "esri/layers/GraphicsLayer", "esri/request", "esri
             this.date = undefined;
         };
         return AnimatedEnvironmentLayerView2D;
-    }(BaseLayerView2D));
+    }(BaseLayerView2D_1.default));
     var AnimatedEnvironmentLayer = /** @class */ (function (_super) {
-        __extends(AnimatedEnvironmentLayer, _super);
+        tslib_1.__extends(AnimatedEnvironmentLayer, _super);
         function AnimatedEnvironmentLayer(properties) {
             var _this = _super.call(this, properties) || this;
             // If the active view is set in properties, then set it here.
@@ -221,11 +203,11 @@ define(["require", "exports", "esri/layers/GraphicsLayer", "esri/request", "esri
             }
             _this.reportValues = properties.reportValues === false ? false : true; // default to true
             // watch url prop so a fetch of data and redraw will occur.
-            watchUtils.watch(_this, "url", function (a, b, c, d) { return _this._urlChanged(a, b, c, d); });
+            watchUtils_1.watch(_this, "url", function (a, b, c, d) { return _this._urlChanged(a, b, c, d); });
             // watch visible so a fetch of data and redraw will occur.
-            watchUtils.watch(_this, "visible", function (a, b, c, d) { return _this._visibleChanged(a, b, c, d); });
+            watchUtils_1.watch(_this, "visible", function (a, b, c, d) { return _this._visibleChanged(a, b, c, d); });
             // watch display options so to redraw when changed.
-            watchUtils.watch(_this, "displayOptions", function (a, b, c, d) { return _this._displayOptionsChanged(a, b, c, d); });
+            watchUtils_1.watch(_this, "displayOptions", function (a, b, c, d) { return _this._displayOptionsChanged(a, b, c, d); });
             _this.dataFetchRequired = true;
             return _this;
         }
@@ -241,11 +223,11 @@ define(["require", "exports", "esri/layers/GraphicsLayer", "esri/request", "esri
             });
             this.layerView.view.on("pointer-move", function (evt) { return _this.viewPointerMove(evt); });
             // since Esri isn't calling attach I presume its related to the modification of this method.
-            // Description says its called after its created and before its asked to draw content.  My assumption that putting
-            // it between the constructor call and before the promise is resolved satisfies this criteria.
+            // Description says attach called after its created and before its asked to draw content.  My assumption is
+            // that putting it between the constructor call and before the promise is resolved satisfies this criteria.
             this.layerView.attach();
             this.draw(true);
-            return promiseUtils.create(function (resolve, reject) { return resolve(_this.layerView); });
+            return promiseUtils_1.create(function (resolve, reject) { return resolve(_this.layerView); });
         };
         /**
          * Start a draw
@@ -261,7 +243,7 @@ define(["require", "exports", "esri/layers/GraphicsLayer", "esri/request", "esri
             if (this.dataFetchRequired) {
                 this.isErrored = false;
                 this.dataLoading = true;
-                esriRequest(this.url, {
+                request_1.default(this.url, {
                     responseType: "json"
                 })
                     .then(function (response) {
@@ -300,7 +282,7 @@ define(["require", "exports", "esri/layers/GraphicsLayer", "esri/request", "esri
             var mousePos = this._getMousePos(evt);
             var point = this.layerView.view.toMap({ x: mousePos.x, y: mousePos.y });
             if (point.spatialReference.isWebMercator) {
-                point = webMercatorUtils.webMercatorToGeographic(point);
+                point = webMercatorUtils_1.webMercatorToGeographic(point);
             }
             var grid = this.layerView.windy.interpolate(point.x, point.y);
             var result = {
@@ -378,32 +360,26 @@ define(["require", "exports", "esri/layers/GraphicsLayer", "esri/request", "esri
             this.layerView.windy.setDisplayOptions(newOptions);
             this.draw();
         };
-        __decorate([
-            asd.property(),
-            __metadata("design:type", String)
+        tslib_1.__decorate([
+            decorators_1.property()
         ], AnimatedEnvironmentLayer.prototype, "url", void 0);
-        __decorate([
-            asd.property(),
-            __metadata("design:type", Object)
+        tslib_1.__decorate([
+            decorators_1.property()
         ], AnimatedEnvironmentLayer.prototype, "displayOptions", void 0);
-        __decorate([
-            asd.property(),
-            __metadata("design:type", Boolean)
+        tslib_1.__decorate([
+            decorators_1.property()
         ], AnimatedEnvironmentLayer.prototype, "reportValues", void 0);
-        __decorate([
-            asd.property(),
-            __metadata("design:type", Boolean)
+        tslib_1.__decorate([
+            decorators_1.property()
         ], AnimatedEnvironmentLayer.prototype, "dataLoading", void 0);
-        __decorate([
-            asd.property(),
-            __metadata("design:type", Boolean)
+        tslib_1.__decorate([
+            decorators_1.property()
         ], AnimatedEnvironmentLayer.prototype, "isErrored", void 0);
-        AnimatedEnvironmentLayer = __decorate([
-            asd.subclass("AnimatedEnvironmentLayer"),
-            __metadata("design:paramtypes", [Object])
+        AnimatedEnvironmentLayer = tslib_1.__decorate([
+            decorators_1.subclass("AnimatedEnvironmentLayer")
         ], AnimatedEnvironmentLayer);
         return AnimatedEnvironmentLayer;
-    }(GraphicsLayer));
+    }(GraphicsLayer_1.default));
     exports.AnimatedEnvironmentLayer = AnimatedEnvironmentLayer;
     /*  Global class for simulating the movement of particle through grid
      credit: All the credit for this work goes to: https://github.com/cambecc for creating the repo:
@@ -806,9 +782,7 @@ define(["require", "exports", "esri/layers/GraphicsLayer", "esri/request", "esri
                 return _this.colorScale;
             };
             var colorStyles = windIntensityColorScale(this.displayOptions.minVelocity, this.displayOptions.maxVelocity);
-            var buckets = colorStyles.map(function () {
-                return [];
-            });
+            var buckets = colorStyles.map(function () { return []; });
             // based on the density setting, add that many per 50px x 50px
             var densityRatio = 50 * window.devicePixelRatio;
             var densityMultiplier = (bounds.width / densityRatio) * (bounds.height / densityRatio);
