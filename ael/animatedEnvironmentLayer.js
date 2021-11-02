@@ -11,14 +11,17 @@
 // the rights to use, copy, modify, merge, publish, distribute, sublicense, 
 // and/or sell copies of the Software, and to permit persons to whom the 
 // Software is furnished to do so, subject to the following conditions:
-define(["require", "exports", "tslib", "esri/layers/GraphicsLayer", "esri/request", "esri/geometry/support/webMercatorUtils", "esri/core/watchUtils", "esri/geometry/Point", "esri/core/accessorSupport/decorators", "esri/views/2d/layers/BaseLayerView2D", "esri/core/promiseUtils"], function (require, exports, tslib_1, GraphicsLayer_1, request_1, webMercatorUtils_1, watchUtils_1, Point_1, asd, BaseLayerView2D_1, promiseUtils_1) {
+define(["require", "exports", "tslib", "esri/layers/GraphicsLayer", "esri/request", "esri/geometry/support/webMercatorUtils", "esri/core/watchUtils", "esri/geometry/Point", "esri/core/accessorSupport/decorators", "esri/views/2d/layers/BaseLayerView2D", "esri/core/promiseUtils"], function (require, exports, tslib_1, GraphicsLayer_1, request_1, webMercatorUtils, watchUtils, Point_1, asd, BaseLayerView2D_1, promiseUtils) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     GraphicsLayer_1 = tslib_1.__importDefault(GraphicsLayer_1);
     request_1 = tslib_1.__importDefault(request_1);
+    webMercatorUtils = tslib_1.__importStar(webMercatorUtils);
+    watchUtils = tslib_1.__importStar(watchUtils);
     Point_1 = tslib_1.__importDefault(Point_1);
     asd = tslib_1.__importStar(asd);
     BaseLayerView2D_1 = tslib_1.__importDefault(BaseLayerView2D_1);
+    promiseUtils = tslib_1.__importStar(promiseUtils);
     var AnimatedEnvironmentLayerView2D = /** @class */ (function (_super) {
         tslib_1.__extends(AnimatedEnvironmentLayerView2D, _super);
         function AnimatedEnvironmentLayerView2D(props) {
@@ -32,7 +35,7 @@ define(["require", "exports", "tslib", "esri/layers/GraphicsLayer", "esri/reques
                 _this.context.canvas.width = _this.view.width;
                 _this.context.canvas.height = _this.view.height;
             });
-            watchUtils_1.watch(_this.layer, "visible", function (nv, olv, pn, ta) {
+            watchUtils.watch(_this.layer, "visible", function (nv, olv, pn, ta) {
                 if (!nv) {
                     _this.clear();
                 }
@@ -128,7 +131,7 @@ define(["require", "exports", "tslib", "esri/layers/GraphicsLayer", "esri/reques
             // use the extent of the view, and not the extent passed into fetchImage...it was slightly off when it crossed IDL.
             var extent = this.view.extent;
             if (extent.spatialReference.isWebMercator) {
-                extent = webMercatorUtils_1.webMercatorToGeographic(extent);
+                extent = webMercatorUtils.webMercatorToGeographic(extent);
             }
             this.northEast = new Point_1.default({ x: extent.xmax, y: extent.ymax });
             this.southWest = new Point_1.default({ x: extent.xmin, y: extent.ymin });
@@ -204,11 +207,11 @@ define(["require", "exports", "tslib", "esri/layers/GraphicsLayer", "esri/reques
             }
             _this.reportValues = properties.reportValues === false ? false : true; // default to true
             // watch url prop so a fetch of data and redraw will occur.
-            watchUtils_1.watch(_this, "url", function (a, b, c, d) { return _this._urlChanged(a, b, c, d); });
+            watchUtils.watch(_this, "url", function (a, b, c, d) { return _this._urlChanged(a, b, c, d); });
             // watch visible so a fetch of data and redraw will occur.
-            watchUtils_1.watch(_this, "visible", function (a, b, c, d) { return _this._visibleChanged(a, b, c, d); });
+            watchUtils.watch(_this, "visible", function (a, b, c, d) { return _this._visibleChanged(a, b, c, d); });
             // watch display options so to redraw when changed.
-            watchUtils_1.watch(_this, "displayOptions", function (a, b, c, d) { return _this._displayOptionsChanged(a, b, c, d); });
+            watchUtils.watch(_this, "displayOptions", function (a, b, c, d) { return _this._displayOptionsChanged(a, b, c, d); });
             _this.dataFetchRequired = true;
             return _this;
         }
@@ -228,7 +231,7 @@ define(["require", "exports", "tslib", "esri/layers/GraphicsLayer", "esri/reques
             // that putting it between the constructor call and before the promise is resolved satisfies this criteria.
             this.layerView.attach();
             this.draw(true);
-            return promiseUtils_1.create(function (resolve, reject) { return resolve(_this.layerView); });
+            return promiseUtils.create(function (resolve, reject) { return resolve(_this.layerView); });
         };
         /**
          * Start a draw
@@ -283,7 +286,7 @@ define(["require", "exports", "tslib", "esri/layers/GraphicsLayer", "esri/reques
             var mousePos = this._getMousePos(evt);
             var point = this.layerView.view.toMap({ x: mousePos.x, y: mousePos.y });
             if (point.spatialReference.isWebMercator) {
-                point = webMercatorUtils_1.webMercatorToGeographic(point);
+                point = webMercatorUtils.webMercatorToGeographic(point);
             }
             var grid = this.layerView.windy.interpolate(point.x, point.y);
             var result = {
