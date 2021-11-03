@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "esnext",
+    "module": "amd",
     "lib": ["es6", "dom"],
     "noImplicitAny": true,
     "esModuleInterop": true,
