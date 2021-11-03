@@ -29,12 +29,11 @@ import SceneView from "esri/views/SceneView";
 import GraphicsLayer from "esri/layers/GraphicsLayer";
 import esriRequest from "esri/request";
 import Extent from "esri/geometry/Extent";
-import * as webMercatorUtils from "esri/geometry/support/webMercatorUtils";
-import * as watchUtils from "esri/core/watchUtils";
+import {webMercatorToGeographic} from "esri/geometry/support/webMercatorUtils";
+import {watch} from "esri/core/watchUtils";
 import Point from "esri/geometry/Point";
-import * as asd from "esri/core/accessorSupport/decorators";
 import BaseLayerView2D from "esri/views/2d/layers/BaseLayerView2D";
-import * as promiseUtils from "esri/core/promiseUtils";
+import {create} from "esri/core/promiseUtils";
 
 
 export type CustomFadeFunction = (context: CanvasRenderingContext2D, bounds: Bounds) => void;
@@ -188,7 +187,7 @@ class AnimatedEnvironmentLayerView2D extends BaseLayerView2D {
         });
 
 
-        watchUtils.watch(this.layer, "visible", (nv, olv, pn, ta) => {
+        watch(this.layer, "visible", (nv, olv, pn, ta) => {
             if (!nv) {
                 this.clear();
             }
@@ -321,7 +320,7 @@ class AnimatedEnvironmentLayerView2D extends BaseLayerView2D {
         // use the extent of the view, and not the extent passed into fetchImage...it was slightly off when it crossed IDL.
         let extent = this.view.extent;
         if (extent.spatialReference.isWebMercator) {
-            extent = <Extent>webMercatorUtils.webMercatorToGeographic(extent);
+            extent = <Extent>webMercatorToGeographic(extent);
         }
 
         this.northEast = new Point({ x: extent.xmax, y: extent.ymax });
@@ -437,13 +436,13 @@ export class AnimatedEnvironmentLayer extends GraphicsLayer {
         this.reportValues = properties.reportValues === false ? false : true; // default to true
 
         // watch url prop so a fetch of data and redraw will occur.
-        watchUtils.watch(this, "url", (a, b, c, d) => this._urlChanged(a, b, c, d));
+        watch(this, "url", (a, b, c, d) => this._urlChanged(a, b, c, d));
 
         // watch visible so a fetch of data and redraw will occur.
-        watchUtils.watch(this, "visible", (a, b, c, d) => this._visibleChanged(a, b, c, d));
+        watch(this, "visible", (a, b, c, d) => this._visibleChanged(a, b, c, d));
 
         // watch display options so to redraw when changed.
-        watchUtils.watch(this, "displayOptions", (a, b, c, d) => this._displayOptionsChanged(a, b, c, d));
+        watch(this, "displayOptions", (a, b, c, d) => this._displayOptionsChanged(a, b, c, d));
         this.dataFetchRequired = true;
     }
 
@@ -467,7 +466,7 @@ export class AnimatedEnvironmentLayer extends GraphicsLayer {
         this.layerView.attach();
 
         this.draw(true);
-        return promiseUtils.create((resolve, reject) => resolve(this.layerView));
+        return create((resolve, reject) => resolve(this.layerView));
     }
 
     /**
@@ -532,7 +531,7 @@ export class AnimatedEnvironmentLayer extends GraphicsLayer {
         let mousePos = this._getMousePos(evt);
         let point = this.layerView.view.toMap({ x: mousePos.x, y: mousePos.y });
         if (point.spatialReference.isWebMercator) {
-            point = <Point>webMercatorUtils.webMercatorToGeographic(point);
+            point = <Point>webMercatorToGeographic(point);
         }
 
         let grid = this.layerView.windy.interpolate(point.x, point.y);
