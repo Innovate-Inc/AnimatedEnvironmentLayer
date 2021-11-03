@@ -404,22 +404,16 @@ class AnimatedEnvironmentLayerView2D extends BaseLayerView2D {
 
 }
 
-@asd.subclass("AnimatedEnvironmentLayer")
 export class AnimatedEnvironmentLayer extends GraphicsLayer {
 
-    @asd.property()
     url: string;
 
-    @asd.property()
     displayOptions: DisplayOptions;
 
-    @asd.property()
     reportValues: boolean;
 
-    @asd.property()
     dataLoading: boolean;
 
-    @asd.property()
     isErrored: boolean;
 
     private dataFetchRequired: boolean;

@@ -6,6 +6,8 @@ import SpatialReference from "esri/geometry/SpatialReference";
 import Basemap from "esri/Basemap";
 
 import {AnimatedEnvironmentLayer, DisplayOptions, PointReport, Bounds, Particle} from "./animatedEnvironmentLayer";
+import Legend from 'esri/widgets/Legend';
+import FeatureLayer from 'esri/layers/FeatureLayer';
 
 interface DataOption {
     id: string;
@@ -30,18 +32,19 @@ export class PageSetup {
 
         this._initDataOptions();
 
-        let satellite = Basemap.fromId("satellite");
+        let base = Basemap.fromId("dark-gray-vector");
         this.map = new Map({
-            basemap: satellite
+            basemap: base
         });
 
         this.mapView = new MapView({
             container: "map-view",
-            center: new Point({x: 134, y: -24, spatialReference: new SpatialReference({wkid: 4326})}),
+            center: new Point({x: -122.226216, y: 41.861379, spatialReference: new SpatialReference({wkid: 4326})}),
             zoom: 4,
             map: this.map,
             ui: {components: ["compass", "zoom"]}
         });
+
         this.mapView.ui.move("zoom", "bottom-right");
         this.mapView.ui.move("compass", "bottom-right");
 
@@ -51,6 +54,8 @@ export class PageSetup {
             displayOptions: this._dataOptions[0].displayOptions
         });
 
+        let testLayer = new FeatureLayer({url: "https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/Current_WildlandFire_Perimeters/FeatureServer/0"})
+        this.map.add(testLayer);
         this.map.add(this.environmentLayer);
 
         //setup some event handlers to react to change of options
@@ -63,6 +68,9 @@ export class PageSetup {
             document.getElementById("direction").innerHTML = rpt.degree ? rpt.degree.toFixed(1) : "n/a";
             document.getElementById("speed").innerHTML = rpt.velocity ? rpt.velocity.toFixed(2) : "n/a";
         });
+
+        let legend = new Legend({view: this.mapView});
+        this.mapView.ui.add(legend, "top-right");
 
     }
 

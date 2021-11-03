@@ -1,4 +1,4 @@
-define(["require", "exports", "tslib", "esri/views/MapView", "esri/Map", "esri/geometry/Point", "esri/geometry/SpatialReference", "esri/Basemap", "./animatedEnvironmentLayer"], function (require, exports, tslib_1, MapView_1, Map_1, Point_1, SpatialReference_1, Basemap_1, animatedEnvironmentLayer_1) {
+define(["require", "exports", "tslib", "esri/views/MapView", "esri/Map", "esri/geometry/Point", "esri/geometry/SpatialReference", "esri/Basemap", "./animatedEnvironmentLayer", "esri/widgets/Legend", "esri/layers/FeatureLayer"], function (require, exports, tslib_1, MapView_1, Map_1, Point_1, SpatialReference_1, Basemap_1, animatedEnvironmentLayer_1, Legend_1, FeatureLayer_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     MapView_1 = tslib_1.__importDefault(MapView_1);
@@ -6,6 +6,8 @@ define(["require", "exports", "tslib", "esri/views/MapView", "esri/Map", "esri/g
     Point_1 = tslib_1.__importDefault(Point_1);
     SpatialReference_1 = tslib_1.__importDefault(SpatialReference_1);
     Basemap_1 = tslib_1.__importDefault(Basemap_1);
+    Legend_1 = tslib_1.__importDefault(Legend_1);
+    FeatureLayer_1 = tslib_1.__importDefault(FeatureLayer_1);
     var PageSetup = /** @class */ (function () {
         function PageSetup() {
             this._dataOptions = [];
@@ -13,13 +15,13 @@ define(["require", "exports", "tslib", "esri/views/MapView", "esri/Map", "esri/g
         PageSetup.prototype.init = function () {
             var _this = this;
             this._initDataOptions();
-            var satellite = Basemap_1.default.fromId("satellite");
+            var base = Basemap_1.default.fromId("dark-gray-vector");
             this.map = new Map_1.default({
-                basemap: satellite
+                basemap: base
             });
             this.mapView = new MapView_1.default({
                 container: "map-view",
-                center: new Point_1.default({ x: 134, y: -24, spatialReference: new SpatialReference_1.default({ wkid: 4326 }) }),
+                center: new Point_1.default({ x: -122.226216, y: 41.861379, spatialReference: new SpatialReference_1.default({ wkid: 4326 }) }),
                 zoom: 4,
                 map: this.map,
                 ui: { components: ["compass", "zoom"] }
@@ -31,6 +33,8 @@ define(["require", "exports", "tslib", "esri/views/MapView", "esri/Map", "esri/g
                 url: this._dataOptions[0].url,
                 displayOptions: this._dataOptions[0].displayOptions
             });
+            var testLayer = new FeatureLayer_1.default({ url: "https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/Current_WildlandFire_Perimeters/FeatureServer/0" });
+            this.map.add(testLayer);
             this.map.add(this.environmentLayer);
             //setup some event handlers to react to change of options
             document.getElementById("data-select").addEventListener("change", function (evt) { return _this._dataChange(evt.target.value); });
@@ -41,6 +45,8 @@ define(["require", "exports", "tslib", "esri/views/MapView", "esri/Map", "esri/g
                 document.getElementById("direction").innerHTML = rpt.degree ? rpt.degree.toFixed(1) : "n/a";
                 document.getElementById("speed").innerHTML = rpt.velocity ? rpt.velocity.toFixed(2) : "n/a";
             });
+            var legend = new Legend_1.default({ view: this.mapView });
+            this.mapView.ui.add(legend, "top-right");
         };
         PageSetup.prototype._dataChange = function (id) {
             var opt = undefined;
